@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>repl.it</title>
+  </head>
+    <canvas id="cl"></canvas>
+    <script>
+    let ImageTag = new Image(); 
+    let c = document.querySelector("#cl");
+     c.width=screen.width*.8;
+     c.height=screen.height*.7;
+     let heightH=Math.floor(Math.random() * c.height)
+     let heightB=Math.floor(Math.random() * c.height)
+     let heightP=100;
+     let widthP=100;
+     console.log(c.width,c.height);
+      let ctx = c.getContext("2d");
+      let s = 0;
+      let player = {x:widthP,y:heightP, radius:35, key:false};
+      let game = {score: 0, life: 3, level:1};
+      let gameObject=[]; 
+      gameObject.push({type:"harm", radius:20, x:c.width,y:Math.floor(Math.random() * (c.height-70)+20), color:"red",speed:Math.floor(Math.random() * game.level*3)+1, img:'https://static-01.daraz.pk/other/shop/0b8c1ec85b07eaf2a2a02cabddec8c53.jpeg_200x200.jpg'});
+      gameObject.push({type:"bene", radius:20, x:c.width,y:Math.floor(Math.random() *(c.height-70)+20), color:"blue",speed:1, img:"https://static-01.daraz.pk/other/shop/0b8c1ec85b07eaf2a2a02cabddec8c53.jpeg_200x200.jpg"});
+      gameObject.push({type:"harm", radius:20, x:c.width,y:Math.floor(Math.random() * (c.height-70)+20), color:"red",speed:Math.floor(Math.random() * game.level*3)+1, img: "https://static-01.daraz.pk/other/shop/0b8c1ec85b07eaf2a2a02cabddec8c53.jpeg_200x200.jpg"});
+
+    //move code taken from stackoverflow and adjusted for personal use
+  const leftArrowPressed = () => {
+            let element = document.getElementById("image1");
+             if(parseInt(element.style.left) - 5 < 0)
+                element.style.left = 0;
+            else
+            element.style.left = parseInt(element.style.left) - 5 + 'px';
+            player.x =   parseInt(element.style.left) - 5 
+                if(game.life<=0)
+                   {
+                       element.style.top=0;
+                       element.style.left=0;
+                   }
+            }
+
+            const rightArrowPressed = () => {
+            let element = document.getElementById("image1");
+            if(parseInt(element.style.left) + 5 > c.width)
+                element.style.left = c.width;
+            else
+                element.style.left = parseInt(element.style.left) + 5 + 'px';
+            player.x = parseInt(element.style.left) + 5
+                if(game.life<=0)
+                   {
+                       element.style.top=0;
+                       element.style.left=0;
+                   }
+            }
+
+            const upArrowPressed = () => {
+            let element = document.getElementById("image1");
+            if(parseInt(element.style.top) - 5 < 0)
+                element.style.top = 0;
+            else
+                element.style.top = parseInt(element.style.top) - 5 + 'px';
+                player.y = parseInt(element.style.top) - 5 
+                    if(game.life<=0)
+                   {
+                       element.style.top=0;
+                       element.style.left=0;
+                   }
+            }
+
+            const downArrowPressed = () => {
+            let element = document.getElementById("image1");
+            if(parseInt(element.style.top) + 5 > c.height-75)
+                element.style.top = c.height-75;
+            else
+                element.style.top = parseInt(element.style.top) + 5 + 'px';
+                player.y = parseInt(element.style.top) + 5 
+                if(game.life<=0)
+                   {
+                       element.style.top=0;
+                       element.style.left=0;
+                   }
+                
+            }
+
+            const moveSelection = (evt) => {
+                player.key=true;
+                switch (evt.keyCode) {
+                    case 37:
+                    leftArrowPressed();
+                    break;
+                    case 39:
+                    rightArrowPressed();
+                    break;
+                    case 38:
+                    upArrowPressed();
+                    break;
+                    case 40:
+                    downArrowPressed();
+                    break;
+                    }
+                };
+
+        const docReady = ()=>
+        {
+              window.addEventListener('keydown', moveSelection);
+        
+        }
+
+    const draw = () => { 
+    console.log(player.key);
+        if(player.key==false)
+         {
+             document.addEventListener("keydown",(e)=>{player.key=true;});
+             ctx.clearRect(0,0,c.width, c.height);
+             ctx.fillStyle = "#FFF000";
+             ctx.fillRect(0,0,c.width, c.height/3);
+             ctx.font = "10px Arial";
+              ctx.fillStyle = "black";                 
+             ctx.fillText("Instructions. Use arrow keys to move. Avoid the bad red bees, they make you lose 1 life. If you reach 0 life you lose. Their stingers are the red circle. Avoid it.", 10, 50);
+             ctx.fillText(" High five the good bees for points. Their arms are the blue circle. Collect them for points. Good luck",10, 60);        
+         }
+    console.log(player.key);
+
+     if(player.key==true)
+         {
+       let element = document.getElementById("image1");
+      ctx.clearRect(0,0,c.width, c.height);
+       for(let i in gameObject)
+       {
+  
+         let g = gameObject[i];
+            ctx.beginPath();
+            ctx.arc(g.x, g.y, g.radius, 0, 2 * Math.PI);
+            ctx.fillStyle = g.color;
+            ctx.fill();
+            ctx.closePath();
+            g.x-=(g.speed);
+           let distx = g.x - (player.x+25);
+           let disty = g.y -  (player.y+25);
+           let distance = Math.sqrt(distx * distx + disty * disty)
+               ImageTag.src = g.img;   // load image
+
+             ctx.drawImage(ImageTag, g.x, g.y);                       
+               
+              
+
+          if (distance < (g.radius +  player.radius)){
+            g.x = c.width;
+            g.y = Math.floor(Math.random() * (c.height-2*g.radius)+g.radius+20);
+            g.speed = Math.floor(Math.random() * game.level*3)+1;
+            if(g.type=="harm")
+                game.life-=1;
+            else
+                game.score+=100;
+          }           
+            game.level=Math.floor(game.score/1000)+1
+         ctx.font = '20px serif';     
+        ctx.fillStyle = "yellow";                 
+         ctx.fillText( `Score: ${game.score} || Lives: ${game.life} || Level: ${game.level}`, 0, c.height); 
+                               
+          if(g.x <= 0 - g.radius){
+            g.x = c.width;
+            g.y = Math.floor(Math.random() * (c.height-6*g.radius)+g.radius);
+            g.speed = Math.floor(Math.random() * game.level*3)+1;
+          }
+
+       }
+         }
+                if(game.life>0)
+                    window.requestAnimationFrame(draw);
+                else
+                   {  
+                        ctx.clearRect(0,0,c.width, c.height);
+                      ctx.fillText("Game Over", c.width/2, c.height/2);
+                   }
+        
+    }
+
+    
+    
+
+   
+
+    
+   
+
+
+
+      docReady();
+      draw();
+
+ 
+      
+
+
+      </script>
+<style>
+body {
+  background-image: url('https://cdn.gamedevmarket.net/wp-content/uploads/20191203191528/Preview-Jungle.jpg');
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: cover;
+}
+</style>
+<body onload="docReady(),draw()" onkeydown="" onkeyup="" bgcolor='pink' >
+  <img id="image1" src="https://png.pngtree.com/png-clipart/20191123/original/pngtree-simple-bear-character-face-png-image_5199407.jpg" style="position:absolute;left:0; top:0;" height="50" width="50">
+  </body>
+</html>
